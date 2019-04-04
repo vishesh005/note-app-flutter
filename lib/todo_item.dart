@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'todo.dart';
 
@@ -17,7 +18,12 @@ class TodoItem extends StatelessWidget {
         title: new Text(title,
             textDirection: TextDirection.ltr,
             style: new TextStyle(color: Colors.white)),
-        actions: <Widget>[new Icon(Icons.exit_to_app)],
+        actions: <Widget>[
+          GestureDetector(
+          child:new Icon(Icons.exit_to_app),
+          onTap: ()=>SystemChannels.platform.invokeMethod('SystemNavigator.pop'),
+          )
+          ],
       ),
       body: new TodoItemBody(),
       floatingActionButton: FloatingActionButton(
@@ -44,12 +50,14 @@ class _TodoItemBodyState extends State<TodoItemBody> {
   @override
   void initState() {
     super.initState();
-    var intData = () async {
+    var initData = () async {
       var pref = await SharedPreferences.getInstance();
       var items = pref.getStringList(NOTE);
+      debugPrint('$items');
       todoItems=(items != null) ? items : todoItems ;
       setState(() {});
     };
+    initData();
   }
 
   @override
@@ -64,7 +72,7 @@ class _TodoItemBodyState extends State<TodoItemBody> {
               title: Text(
                 todoItems[position],
                 textDirection: TextDirection.ltr,
-                style: TextStyle(fontSize: 25.0, fontWeight: FontWeight.w500),
+                style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.w500),
               ),
               leading: CircleAvatar(
                 backgroundColor: _getRandomColor(),

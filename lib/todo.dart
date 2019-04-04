@@ -3,7 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 class TodoScreen extends StatelessWidget {
-  String title;
+  final String title;
 
   TodoScreen({Key key, String this.title});
   @override
@@ -15,20 +15,21 @@ class TodoScreen extends StatelessWidget {
         title: new Text(title,
             textDirection: TextDirection.ltr,
             style: new TextStyle(color: Colors.white)),
-        actions: <Widget>[Icon(Icons.save)],
       ),
-      body: new TodoBody(),
+      body: new _TodoBody(),
     );
   }
 }
 
-class TodoBody extends StatefulWidget {
+class _TodoBody extends StatefulWidget {
+  _TodoBodyState state = _TodoBodyState();
+
   @override
-  _TodoBodyState createState() => _TodoBodyState();
+  _TodoBodyState createState() => state;
 }
 
-class _TodoBodyState extends State<TodoBody> {
-  TextEditingController _noteController = new TextEditingController();
+class _TodoBodyState extends State<_TodoBody> {
+  final TextEditingController _noteController = new TextEditingController();
   final String NOTE = 'note';
   @override
   Widget build(BuildContext context) {
@@ -55,6 +56,8 @@ class _TodoBodyState extends State<TodoBody> {
               keyboardType: TextInputType.multiline,
               maxLines: 100,
               controller: _noteController,
+              onSubmitted: (str) => _saveNote(),
+              textInputAction: TextInputAction.done,
             ),
           ),
         ],
@@ -63,12 +66,14 @@ class _TodoBodyState extends State<TodoBody> {
   }
 
   _saveNote() async {
-    if (_noteController.text.isNotEmpty) {
+    String message = _noteController.text;
+    _noteController.clear();
+    if (message.isNotEmpty) {
       SharedPreferences pref = await SharedPreferences.getInstance();
       List<String> list = pref.getStringList(NOTE);
       if (list == null) list = new List();
-      pref.setStringList(NOTE, list);
-      pref.commit();
+      list.add(message);
+      await pref.setStringList(NOTE, list);
       showToast("Note Saved sucessfully");
       Navigator.pop(context);
     }
@@ -79,7 +84,7 @@ showToast(String message) {
   Fluttertoast.showToast(
       msg: message,
       toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.CENTER,
+      gravity: ToastGravity.BOTTOM,
       timeInSecForIos: 1,
       backgroundColor: Colors.black38,
       textColor: Colors.white,
