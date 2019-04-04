@@ -1,6 +1,6 @@
 # todo_app
 
-Note Taking Flutter App.
+Todo Flutter App.
 
 ## Getting Started
 
