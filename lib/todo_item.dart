@@ -20,19 +20,21 @@ class TodoItem extends StatelessWidget {
             style: new TextStyle(color: Colors.white)),
         actions: <Widget>[
           GestureDetector(
-          child:new Icon(Icons.exit_to_app),
-          onTap: ()=>SystemChannels.platform.invokeMethod('SystemNavigator.pop'),
+            child: new Icon(Icons.exit_to_app),
+            onTap: () =>
+                SystemChannels.platform.invokeMethod('SystemNavigator.pop'),
           )
-          ],
+        ],
       ),
       body: new TodoItemBody(),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add, color: Colors.white),
         backgroundColor: Colors.blueGrey.shade900,
-        onPressed: (){
-          Navigator.push(context, new MaterialPageRoute(
-            builder: (context)=> new TodoScreen(title: 'Add Todo')
-          ));
+        onPressed: () {
+          Navigator.push(
+              context,
+              new MaterialPageRoute(
+                  builder: (context) => new TodoScreen(title: 'Add Todo')));
         },
       ),
     );
@@ -46,7 +48,7 @@ class TodoItemBody extends StatefulWidget {
 
 class _TodoItemBodyState extends State<TodoItemBody> {
   final String NOTE = 'note';
-  List<String> todoItems=['ABC','ABC'];
+  List<String> todoItems = ['ABC', 'ABC'];
   @override
   void initState() {
     super.initState();
@@ -54,7 +56,7 @@ class _TodoItemBodyState extends State<TodoItemBody> {
       var pref = await SharedPreferences.getInstance();
       var items = pref.getStringList(NOTE);
       debugPrint('$items');
-      todoItems=(items != null) ? items : todoItems ;
+      todoItems = (items != null) ? items : todoItems;
       setState(() {});
     };
     initData();
@@ -80,6 +82,18 @@ class _TodoItemBodyState extends State<TodoItemBody> {
                   todoItems[position][0].toUpperCase(),
                   style: TextStyle(fontSize: 25.0, fontWeight: FontWeight.w500),
                 ),
+              ),
+              trailing: GestureDetector(
+                  child: Icon(
+                Icons.delete,
+                color: Colors.black,
+              ),
+              onTap: ()async{
+                todoItems.remove(todoItems[position]);
+                SharedPreferences pref =await SharedPreferences.getInstance();
+                await  pref.setStringList(NOTE,todoItems);
+                setState(() {});
+              },
               ),
             ),
           );
